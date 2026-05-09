@@ -16,17 +16,20 @@ module.exports = {
             res.status(500).json({ message: "Internal Server Error!" })
         }
     },
-    order: async(req, res) => {
+    placeMarketOrder: async(req, res) => {
         try {
             const client = new Spot(binanceApiKey, binanceSecretKey)
-            const data = client.newOrder('BTCUSDT', 'BUY', 'LIMIT', {
-                price: '350',
+            const response = await client.newOrder('BTCUSDT', 'BUY', 'MARKET', {
                 quantity: 1,
-                timeInForce: 'GTC'
-            }).then(response => client.logger.log(response.data))
-            .catch(error => client.logger.error(error))
+            })
+            res.status(200).json({
+                data: response
+            })
         } catch (error) {
-            res.status(500).json({ message: "Internal Server Error" })
+            res.status(500).json({ 
+                message: "Internal Server Error",
+                error: error.response?.data || error.message  // tampilkan error dari Binance
+            });
         }
     }
 }
