@@ -13,7 +13,10 @@ module.exports = {
             })
             
         } catch (error) {
-            res.status(500).json({ message: "Internal Server Error!" })
+            res.status(500).json({ 
+                message: "Internal Server Error",
+                error: error.response?.data || error.message  // tampilkan error dari Binance
+            });
         }
     },
     placeMarketOrder: async(req, res) => {
