@@ -5,6 +5,7 @@ const logger = require('morgan');
 
 const testRouter = require("./app/test/router")
 const spotRouter = require("./app/spot/router")
+const priceRouter = require("./app/price/router")
 
 const app = express();
 
@@ -16,5 +17,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/test', testRouter);
 app.use('/spot', spotRouter)
+app.use('/price', priceRouter)
 
 module.exports = app;
