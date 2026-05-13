@@ -18,8 +18,9 @@ module.exports = {
     },
     symbolPrice: async(req, res) => {
         try {
+            const { symbol } = req.body
             const client = new Spot(binanceApiKey, binanceSecretKey)
-            const response = await client.tickerPrice('BTCUSDT')
+            const response = await client.tickerPrice(symbol)
 
             res.status(200).json({
                 data: response.data
