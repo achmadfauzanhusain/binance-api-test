@@ -16,6 +16,21 @@ module.exports = {
             });
         }
     },
+    symbolPrice: async(req, res) => {
+        try {
+            const client = new Spot(binanceApiKey, binanceSecretKey)
+            const response = await client.tickerPrice('BTCUSDT')
+
+            res.status(200).json({
+                data: response.data
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: "Internal Server Error",
+                error: error.response?.data ?? error.message ?? "Unknown Error"
+            })
+        }
+    },
     minQty: async(symbol) => {
         const client = new Spot(binanceApiKey, binanceSecretKey)
         const coinInfo = await client.exchangeInfo({ symbol: symbol })
