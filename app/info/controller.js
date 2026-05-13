@@ -16,21 +16,10 @@ module.exports = {
             });
         }
     },
-    symbolPrice: async(req, res) => {
-        try {
-            const { symbol } = req.body
-            const client = new Spot(binanceApiKey, binanceSecretKey)
-            const response = await client.tickerPrice(symbol)
-
-            res.status(200).json({
-                data: response.data
-            })
-        } catch (error) {
-            res.status(500).json({
-                message: "Internal Server Error",
-                error: error.response?.data ?? error.message ?? "Unknown Error"
-            })
-        }
+    symbolPrice: async(symbol) => {
+        const client = new Spot(binanceApiKey, binanceSecretKey)
+        const response = await client.tickerPrice(symbol)
+        return parseFloat(response.data.price)  // return angkanya langsung
     },
     minQty: async(symbol) => {
         const client = new Spot(binanceApiKey, binanceSecretKey)

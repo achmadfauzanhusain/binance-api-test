@@ -1,18 +1,22 @@
 const { Spot } = require('@binance/connector')
-const { minQty, amountToQuantity } = require("../info/controller")
+const { minQty, amountToQuantity, symbolPrice } = require("../info/controller")
 const { binanceApiKey, binanceSecretKey } = require('../../config')
 
 module.exports = {
     placeMarketOrder: async(req, res) => {
         try {
-            const { quantity } = req.body
+            const { amount } = req.body
+
+            const minNotValueCount = await minQty("BTCUSDT")
+            const price = await symbolPrice("BTCUSDT")
+            const quantity = await amountToQuantity(amount, price, minNotValueCount)
 
             const client = new Spot(binanceApiKey, binanceSecretKey)
             const response = await client.newOrder('BTCUSDT', 'BUY', 'MARKET', {
                 quantity: quantity,
             })
             res.status(200).json({
-                data: response
+                data: quantity
             })
         } catch (error) {
             res.status(500).json({ 
@@ -23,9 +27,9 @@ module.exports = {
     },
     placeLimitOrder: async(req, res) => {
         try {
-            const { symbol, amount, price } = req.body
+            const { amount, price } = req.body
 
-            const minNotValueCount = await minQty(symbol)
+            const minNotValueCount = await minQty("BTCUSDT")
             const quantity = await amountToQuantity(amount, price, minNotValueCount)
 
             const client = new Spot(binanceApiKey, binanceSecretKey)
