@@ -1,5 +1,14 @@
-const { Spot } = require('@binance/connector')
+const { Spot, WebsocketStream } = require('@binance/connector')
 const { binanceApiKey, binanceSecretKey } = require('../../config')
+
+const callbacks = {
+    open: () => logger.debug('Connected with Websocket server'),
+    close: () => logger.debug('Disconnected with Websocket server'),
+    message: data => logger.info(data)
+}
+
+// initialize websocket stream with microseconds as the preferred time unit
+const websocketStreamClient = new WebsocketStream({ callbacks, wsURL: "wss://stream.binance.com" })
 
 module.exports = {
     account: async(req, res) => {
@@ -14,6 +23,33 @@ module.exports = {
                 message: "Internal Server Error",
                 error: error.response?.data || error.message  // tampilkan error dari Binance
             });
+        }
+    },
+    listenOrders: async(req, res) => {
+        try {
+            const callbacks = {
+                open: () => console.log('WebSocket connected'),
+                close: () => console.log('WebSocket disconnected'),
+                message: (data) => {
+                    const parsed = JSON.parse(data)
+                    console.log('Event:', parsed)
+                    res.status(200).json({
+                        message: 'WebSocket listening...',
+                        data: parsed
+                    })
+                }
+            }
+
+            const wsClient = new WebsocketStream({ callbacks })
+            
+            // listen harga BTC realtime
+            wsClient.trade('btcusdt')
+        } catch (error) {
+            console.error(error)
+            res.status(500).json({
+                message: "Internal Server Error",
+                error: error.response?.data ?? error.message ?? "Unknown Error"
+            })
         }
     },
     symbolPrice: async(symbol) => {
