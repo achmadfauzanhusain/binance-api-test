@@ -11,12 +11,14 @@ module.exports = {
             const price = await symbolPrice("BTCUSDT")
             const quantity = await amountToQuantity(amount, price, minNotValueCount)
 
-            const client = new Spot(binanceApiKey, binanceSecretKey)
+            const client = new Spot(binanceApiKey, binanceSecretKey, {
+                baseURL: 'https://testnet.binance.vision'  // ✅ tambah baseURL
+            })
             const response = await client.newOrder('BTCUSDT', 'BUY', 'MARKET', {
                 quantity: quantity,
             })
             res.status(200).json({
-                data: quantity
+                data: response.data
             })
         } catch (error) {
             res.status(500).json({ 
